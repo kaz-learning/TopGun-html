@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title> 🙏トップガン10講座 申請ページ🙏</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      overflow-y: scroll;
+      overflow-x: auto;
+    }
+
+    body {
+      font-family: sans-serif;
+      background-color: #f5f7fa;
+      padding: 30px;
+    }
+
+    .container {
+      width: 100%;
+      min-width: 700px;
+      max-width: 900px;
+      margin: 0 auto;
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 8px rgba(0, 0, 0, 0.1);
+    }
+
+/* 「min-width: 700px;」には2つの役割がある！
+①画面拡大時
+→ ブラウザの実効表示領域（body）が狭くなっても、そこにcontainerをムリヤリ700px未満に圧縮して詰め込もうとしない（レイアウト崩れ防止）
+→ その代わり、「横スクロール」を発生させて画面外にはみ出しOKとしている
+②画面縮小時
+→ containerが小さくなり続けるのを700pxで止める
+（極端な縮小によるレイアウト崩れ(小さすぎて見えない)を防止）
+*/
+
+    h1 {
+      font-size: 24px;
+      text-align: center;
+      margin-bottom: 5px;
+      cursor: pointer;
+    }
+
+    h2 {
+      font-size: 18px;
+      text-align: center;
+      margin-top: 0;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="email"] {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    select {
+      width: 100%;
+      max-width: 260px;
+      padding: 8px;
+      box-sizing: border-box;
+    }
+
+    .search-condition-area {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .search-condition-left {
+      flex: 1 1 300px;
+      min-width: 0;
+    }
+
+    .search-condition-image {
+      flex: 0 1 180px;
+      max-width: 100%;
+      width: 180px;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      margin-top: 8px;
+    }
+
+    /* 以下の下3行：拡大時のシークバー「ツマミ機能の逆転」防止 */
+    #studyTime {
+      width: 100%;
+      min-width: 0;
+      direction: ltr;
+      writing-mode: horizontal-tb;
+    }
+
+    .range-area {
+      display: grid;
+      grid-template-columns: 32px minmax(80px, 1fr) 32px;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      max-width: 260px;
+    }
+
+    .range-button {
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+    }
+
+    .date-buttons {
+      flex-wrap: wrap;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .date-button {
+      width: 95px;
+      padding: 6px;
+      cursor: pointer;
+      line-height: 1.3;
+    }
+
+    .date-button span {
+      display: block;
+    }
+
+    .date-button.selected {
+      background-color: #1f5fbf;
+      color: white;
+    }
+
+    .time-buttons {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .time-buttons button {
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .time-buttons button:disabled {
+      background-color: #ddd;
+      color: #888;
+      cursor: not-allowed;
+    }
+
+    .time-buttons button.selected {
+      background-color: #1f5fbf;
+      color: white;
+    }
+
+    .result-count {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .result-list {
+      margin: 15px 0;
+      text-align: left;
+    }
+
+    .result-item {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 5px;
+      background-color: #fafafa;
+    }
+
+    .result-item label {
+      display: inline;
+      font-weight: normal;
+      cursor: pointer;
+    }
+
+    .result-item.selected {
+      background-color: #e8f1ff;
+      border-color: #2f80ed;
+    }
+
+    .action-button {
+      display: block;
+      width: auto;
+      min-width: 120px;
+      max-width: 100%;
+      padding: 12px;
+      background-color: #2f80ed;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin: 10px auto;
+    }
+
+    .button-area {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .about-link {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .about-link a {
+      color: #2f80ed;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: red;
+      font-size: 13px;
+      margin-top: 5px;
+    }
+
+    .page-top-button {
+      position: fixed;
+      right: max(16px, calc((100vw - 900px) / 2 + 16px));
+      bottom: 16px;
+      width: clamp(44px, 6vw, 56px);    /* clamp(最小, 可変(viewportの6％), 最大) */
+      height: clamp(44px, 6vw, 56px);
+      border-radius: 50%;
+      border: none;
+      background-color: #2f80ed;
+      color: white;
+      font-size: clamp(9px, 1.5vw, 11px);
+      cursor: pointer;
+      display: none;
+      z-index: 999;
+    }
+
+    .fire {
+      display: inline-block;
+      animation: fireMove 0.8s infinite alternate;
+    }
+
+    @keyframes fireMove {
+      from {
+        transform: rotate(-8deg) scale(1);
+      }
+      to {
+        transform: rotate(8deg) scale(1.15);
+      }
+    }
+
+  /* 「@media (max-width: 480px) { }」＝「画面幅480px以下の時だけ有効」 */
+  @media (max-width: 480px) {
+    .search-condition-image {
+      display: none;
+    }
+
+    .time-buttons {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+  }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1 id="topTitle"> 🙏トップガン10講座 申請🙏 </h1>
+    <h2><span class="fire">🔥</span>来たれ強者たちよ<span class="fire">🔥</span></h2>
+
+    <!-- リンク(ページ遷移) -->
+    <div class="about-link">
+      <a href="#" id="aboutLink">トップガンについて</a>
+    </div>
+
+    <!-- 入力欄(名前) -->
+    <div class="form-group">
+      <label for="name">名前</label>
+      <input type="text" id="name" placeholder="例：山田 太郎">
+      <div id="nameError" class="error-message"></div>
+    </div>
+
+    <!-- 入力欄(メール) -->
+    <div class="form-group">
+      <label for="email">メールアドレス</label>
+      <input type="text" id="email" placeholder="例：sample@example.com">
+      <div id="emailError" class="error-message"></div>
+    </div>
+
+<div class="search-condition-area">
+<div class="search-condition-left">
+
+    <!-- プルダウン(受講科目) -->
+      <div class="form-group">
+        <label for="subject">受講科目</label>
+        <select id="subject">
+          <option value="">選択してください</option>
+          <option value="office">Excel＋PowerPoint</option>
+          <option value="ai">生成AI</option>
+          <option value="test">テスト設計＋テスト設計TD</option>
+        </select>
+      </div>
+
+    <!-- シークバー(講座時間) -->
+    <div class="form-group">
+      <label for="studyTime">講座時間：<span id="studyTimeValue">60</span>分</label>
+      <div class="range-area">
+        <button class="range-button" id="minusButton" type="button">－</button>
+        <input type="range" id="studyTime" min="60" max="120" step="30" value="60">
+        <button class="range-button" id="plusButton" type="button">＋</button>
+      </div>
+    </div>
+
+    <!-- ラジオボタン(希望レベル) -->
+    <div class="form-group">
+      <label>希望レベル</label>
+      <div><input type="radio" name="course" value="初心者"> 初心者</div>
+      <div><input type="radio" name="course" value="上級者"> 上級者</div>
+    </div>
+
+</div>
+
+<img class="search-condition-image" src="https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=300" alt="試験のイメージ画像">
+</div>
+
+    <!-- ボタン(検索) -->
+    <div class="button-area">
+      <button class="action-button" id="searchButton" type="button">検索</button>
+      <div class="result-count">表示：<span id="resultCount">5</span>件</div>
+      <div id="resultList" class="result-list"></div>
+    </div>
+
+    <!-- 選択ボタン(予約時間帯) --> 
+    <div class="form-group">
+      <label>予約時間帯</label>
+
+      <div class="date-buttons">
+        <button class="date-button selected" id="todayButton" type="button">
+          <span>本日</span>
+          <span id="todayDate"></span>
+        </button>
+        <button class="date-button" id="tomorrowButton" type="button">
+          <span>明日</span>
+          <span id="tomorrowDate"></span>
+        </button>
+      </div>
+
+<!--
+【1】classの違い
+・本日：date-button selected　→class「date-button」(日付ボタン)＋「selected」(現在選択中)の同時適用
+※classは「半角スペース」で区切ることで複数同時に指定できる
+・明日：date-button　→class「date-button」(日付ボタン)のみを適用
+
+【2】div／spanの違い
+・div → ブロック（大きなまとまり）
+・span → 文字・文章の一部分（小さなまとまり）
+※span は「文字の一部分だけにCSSやJSを当てたい」時によく使う
+--> 
+
+      <div class="time-buttons">
+        <button type="button" data-start="9">9:00-10:00</button>
+        <button type="button" data-start="10">10:00-11:00</button>
+        <button type="button" data-start="11">11:00-12:00</button>
+        <button type="button" data-start="13">13:00-14:00</button>
+        <button type="button" data-start="14">14:00-15:00</button>
+        <button type="button" data-start="15">15:00-16:00</button>
+      </div>
+    </div>
+
+    <!-- チェックボックス(受講目的) --> 
+    <div class="form-group">
+      <label>受講目的</label>
+      <div><input type="checkbox"> 資格対策</div>
+      <div><input type="checkbox"> 実務練習</div>
+      <div><input type="checkbox"> 知識習得</div>
+    </div>
+
+    <!-- ボタン(申し込み) -->
+    <div class="button-area">
+      <button class="action-button" id="applyButton" type="button">申し込む</button>
+    </div>
+
+  </div>
+
+<button id="pageTopButton" class="page-top-button" type="button">ページ<br>トップへ</button>
+
+<script>
+/* ===== 初期設定：HTML要素を取得 ===== */
+  const topTitle = document.getElementById("topTitle");
+  const aboutLink = document.getElementById("aboutLink");
+  const nameInput = document.getElementById("name");
+  const emailInput = document.getElementById("email");
+  const nameError = document.getElementById("nameError");
+  const emailError = document.getElementById("emailError");
+  const todayDate = document.getElementById("todayDate");
+  const tomorrowDate = document.getElementById("tomorrowDate");
+  const studyTime = document.getElementById("studyTime");
+  const studyTimeValue = document.getElementById("studyTimeValue");
+  const minusButton = document.getElementById("minusButton");
+  const plusButton = document.getElementById("plusButton");
+  const searchButton = document.getElementById("searchButton");
+  const resultList = document.getElementById("resultList");
+  const resultCount = document.getElementById("resultCount");
+  const todayButton = document.getElementById("todayButton");
+  const tomorrowButton = document.getElementById("tomorrowButton");
+  const timeButtons = document.querySelectorAll(".time-buttons button");
+  const applyButton = document.getElementById("applyButton");
+
+/* ===== 講座候補を自動生成===== */
+  const subjects = ["Excel＋PowerPoint", "生成AI", "テスト設計＋テスト設計TD"];
+  const times = [60, 90, 120];
+  const levels = ["初心者", "上級者"];
+  const titles = ["を学ぼう！", "完全マスター", "入門講座", "実践トレーニング", "短期集中"];
+
+  const lessons = [];
+
+  for (let i = 0; i < 70; i++) {
+    const subject = subjects[Math.floor(Math.random() * subjects.length)];
+    const time = times[Math.floor(Math.random() * times.length)];
+    const level = levels[Math.floor(Math.random() * levels.length)];
+    const title = subject + titles[Math.floor(Math.random() * titles.length)];
+
+/*【理解】
+●「subjects.length」は「const subjects = ["Excel＋PowerPoint", "生成AI", "テスト設計＋テスト設計TD"]」の個数(3つ)を返すメソッドであり、そこにランダム値をかけて「Math.floor」（小数点切り捨て）することで「subjectsのインデックス番号のランダム選択」を実現し、ランダムでsubjectからキーワードを選べるようにしている。
+●「subjects[Math.floor(Math.random() * subjects.length)]」について。
+・「subjects.length」→要素の個数が3つなので「3」を返す			←MAX：3
+・「subjects[X]」のインデックスXには（0/1/2）が入って値を返す		←MAX：2（1小さい）
+・「X＝Math.floor(Math.random() * subjects.length)」について。「Math.random()：0以上1未満のランダム」×「subjects.length：要素数3」＝「0以上3未満のランダム」となるため、「X＝Math.floor(0以上3未満)＝0～2のランダム」となり、「subjects[X]＝要素0～2からランダムに選ばれたsubject」となる。
+●ポイント：「length：1・2・3」と「X（インデックス）：0・1・2」の「数え方の差＝1」を利用した方法。
+*/
+
+    lessons.push({
+      subject: subject,
+      time: time,
+      level: level,
+      title: title
+    });
+  }
+
+/* ===== タイトルクリックでリロード ===== */
+  topTitle.addEventListener("click", function () {
+    location.reload();
+  });
+
+  aboutLink.addEventListener("click", function (event) {
+    event.preventDefault();
+
+    document.querySelector(".container").innerHTML =
+      '<h1 id="topTitleAbout"> 🙏トップガン10講座 申請🙏 </h1>' +
+      '<p style="text-align:center; font-weight:bold;">準備中</p>' +
+      '<button class="action-button" id="backButton" type="button">戻る</button>';
+
+/*【学習メモ】上記4段（document.querySelector(".container").innerHTML =…）について
+【概要】
+ページ全体からclass「container」を選択、その中身を「別HTML」に丸ごと置き換える(ページ遷移の擬態)
+【分解】
+・document：「ページ全体（HTMLすべて）」＝head(meta)＋style(CSS) ＋body(表示) ＋script(JS)
+・querySelector(".container")：その中からclass「container」を問合せて選択
+・innerHTML：選択した要素（container）の中身のHTML
+・＝：左を右に置き換える
+【詳細】フローは以下。
+(1)既出のclass「container」を問合せて選択(.querySelector)して
+(2)その中の全部（「<div class="container">A</div>」：A＝子要素すべて）に限定した
+(3)HTML内容(取得した要素の.innerHTML)を
+(4)「＝」で別内容「'<h1 id="topTitleAbout">…戻る</button>'」に置き換える
+※初めの内容は「上書きされる」ため消える
+ */
+
+    document.getElementById("topTitleAbout").addEventListener("click", function () {
+      location.reload();
+    });
+
+  document.getElementById("backButton").addEventListener("click", function () {
+    location.reload();
+  });
+});
+
+/* ===== 名前・メールアドレスの入力チェック ===== */
+function validateName() {
+  if (nameInput.value.length > 30) {
+    nameError.textContent = "30文字以内で入力して下さい";
+    return false;
+  }
+
+  nameError.textContent = "";
+  return true;
+}
+
+function validateEmail() {
+  const emailValue = emailInput.value;
+  const halfWidthPattern = /^[\x21-\x7E]*$/;
+  const emailPattern = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+
+  if (!halfWidthPattern.test(emailValue)) {
+    emailError.textContent = "半角アルファベット・数字・記号のみが入力可能です";
+    return false;
+  }
+
+  if (emailValue !== "" && !emailPattern.test(emailValue)) {
+    emailError.textContent = "有効なメールアドレスを入力してください";
+    return false;
+  }
+
+  emailError.textContent = "";
+  return true;
+}
+
+nameInput.addEventListener("blur", validateName);
+emailInput.addEventListener("blur", validateEmail);	/* 次行に入れてた”input”を削除した */
+
+/* ===== 講座時間の表示更新 ===== */
+/* == ①「シークバーの現在値」を画面上の表示に反映する関数 == */
+  function updateStudyTime() {
+    studyTimeValue.textContent = studyTime.value;
+  }
+
+/* == ②HTML「<span id="studyTimeValue">60</span>」をシークバー現在値に書き換え == */
+  studyTime.addEventListener("input", updateStudyTime);
+
+/* ===== ＋－ボタン処理 ===== */
+  minusButton.addEventListener("click", function () {
+    studyTime.value = Math.max(60, Number(studyTime.value) - 30);
+    updateStudyTime();
+  });
+
+  plusButton.addEventListener("click", function () {
+    studyTime.value = Math.min(120, Number(studyTime.value) + 30);
+    updateStudyTime();
+  });
+
+/*【メモ】minusButton内の「studyTime.value = Math.max(60, Number(studyTime.value) - 30)」について
+「60分」と「現在値－30分」を比較し、大きい方を採用する。これにより、60分未満にはならない。
+※また、マイナスボタンであり最大値（120分）に到達させる機能は必要ないため、「60分vs現在値－30分」の大きい方という判断で問題ない。
+*/
+
+/* ===== 日付ボタン制御 ===== */
+  let selectedDateType = "today";
+
+  function formatDate(date) {
+    return (date.getMonth() + 1) + "月" + date.getDate() + "日";
+  }
+
+  function updateDateButtonLabels() {
+    const today = new Date();
+    const tomorrow = new Date();
+    tomorrow.setDate(today.getDate() + 1);
+
+    todayDate.textContent = "（" + formatDate(today) + "）";
+    tomorrowDate.textContent = "（" + formatDate(tomorrow) + "）";
+  }
+
+  todayButton.addEventListener("click", function () {
+    selectedDateType = "today";
+    todayButton.classList.add("selected");
+    tomorrowButton.classList.remove("selected");
+    updateTimeButtons();
+  });
+
+  tomorrowButton.addEventListener("click", function () {
+    selectedDateType = "tomorrow";
+    tomorrowButton.classList.add("selected");
+    todayButton.classList.remove("selected");
+    updateTimeButtons();
+  });
+
+
+/* ===== 予約時間ボタン制御 ===== */
+  function updateTimeButtons() {
+    const nowHour = new Date().getHours();
+
+    timeButtons.forEach(function (button) {
+      const startHour = Number(button.dataset.start);
+
+      button.disabled = false;
+      button.classList.remove("selected");
+
+      if (selectedDateType === "today" && startHour <= nowHour) {
+        button.disabled = true;
+      }
+    });
+  }
+
+/* ===== 予約時間ボタン選択処理 ===== */
+  timeButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+      timeButtons.forEach(function (btn) {
+        btn.classList.remove("selected");
+      });
+
+      button.classList.add("selected");
+    });
+  });
+
+/* ===== 検索結果表示処理 ===== */
+  function displayLessons(list) {
+    resultList.innerHTML = "";
+
+    list.forEach(function (lesson, index) {
+      const div = document.createElement("div");
+      div.className = "result-item";
+
+      div.innerHTML = 
+        '<label>' +
+        '<input type="checkbox" class="lesson-check" value="' + index + '">' +
+        lesson.title+ "／" + lesson.time + "分／" + lesson.level +
+      '</label>';
+
+      resultList.appendChild(div);
+    });
+
+    resultCount.textContent = list.length;
+  }
+
+/* ===== 検索ボタン押下時の絞り込み処理 ===== */
+  searchButton.addEventListener("click", function () {
+    const subjectSelect = document.getElementById("subject");
+    const selectedSubject = subjectSelect.options[subjectSelect.selectedIndex].text;
+    const selectedTime = Number(studyTime.value);
+    const selectedLevel = document.querySelector('input[name="course"]:checked');
+
+/* 未入力項目に対するダイアログ表示 */
+  if (subjectSelect.value === "" || !selectedTime || !selectedLevel) {
+    alert("未入力の項目を入力してください");
+    return;
+  }
+
+/* 選択された条件に一致する講座だけを抽出 */
+    const filteredLessons = lessons.filter(function (lesson) {
+      return lesson.subject === selectedSubject
+        && lesson.time === selectedTime
+      /* && selectedLevel →削除：レベル未選択NGは上記ifで折込み済のため*/
+        && lesson.level === selectedLevel.value;
+    });
+
+/* 【学習メモ】初めは「const」にせず「let」にしておく理由
+【実務】以下フローが主流
+・「後で値を書き換える可能性」を見て、最初は「let（可変）」で書くことがある
+・コードが固まったら「再代入しない変数」は「const（固定）」にする
+※初心者向けに「全部letで統一」のケースもある
+【まとめ】
+・最初：仕様が固まっていない → let（仮置き）
+・完成後：再代入しないと確定 → const（確定）
+・例外：再代入が必要な変数（ループカウンタ等）→ letのまま
+*/
+
+/* 一致する講座がない場合 */
+    if (filteredLessons.length === 0) {
+      resultList.innerHTML = "検索結果はありません";
+      resultCount.textContent = 0;
+      return;
+    }
+
+    displayLessons(filteredLessons);
+  });
+
+/* ===== 未選択時のダイアログ／申し込み完了 ===== */
+    applyButton.addEventListener("click", function () {
+      const selectedLessons = document.querySelectorAll(".lesson-check:checked");
+      const selectedTimeButton = document.querySelector(".time-buttons button.selected");
+
+      if (nameInput.value.trim() === "") {
+        alert("名前を入力してください");
+        return;
+      }
+
+      if (!validateName()) {
+        alert("名前が有効ではありません");
+        return;
+      }
+
+      if (emailInput.value.trim() === "") {
+        alert("メールアドレスを入力してください");
+        return;
+      }
+
+      if (!validateEmail()) {
+        alert("メールアドレスが有効ではありません");
+        return;
+      }
+
+      if (selectedLessons.length === 0) {
+        alert("検索結果を選択してください");
+        return;
+      }
+
+/*【学習メモ】上「if (selectedLessons.length === 0)」／下「if (!selectedTimeButton)」の違いについて
+同じ記載形式で統一しなかった理由は以下。
+●上（検索結果）
+【要約】「箱（リスト）の中の個数」でチェック（0かどうか）
+【詳細】形式「配列[0,1,2,…] 」のため、「.length」（要素個数の抽出）で「リスト内個数が0個か」を判定
+【補足】
+・「querySelectorAll()」 → リスト[0,1,2,…] の形で返る
+・「.length」で「要素数」を取って「0件か」を判定
+●下（予約時間帯）
+【要約】「単体要素の有無」でチェック（あるか／ないか）
+【詳細】形式「単体（要素 or null）」のため、「存在する・しない」で判定
+【補足】
+・「querySelector()」 → 要素 or null で返る
+・null（未選択）を ! で判定
+*/
+
+      if (!selectedTimeButton) {
+        alert("予約時間帯を選択してください");
+        return;
+      }
+/*【学習メモ】「if (!selectedTimeButton)」の解説
+・前提：「!」＝「not・反転(true⇔false)」／「ifはtrueで発動」
+・機能：「selectedTimeButtonが 空(null/undefined＝“false”) 」の時に「not(!)で“true”に転換」される
+・結果：「alert発動」
+*/
+      alert("申し込みを完了しました");
+    });
+
+/* ===== 初期表示処理 ===== */
+  updateStudyTime();
+  updateDateButtonLabels();
+  updateTimeButtons();
+/*== 初期表示では講座候補の先頭5件だけを表示 ==*/
+  displayLessons(lessons.slice(0, 5));
+
+/*== ページトップボタン処理 ==*/
+  const pageTopButton = document.getElementById("pageTopButton");
+
+  window.addEventListener("scroll", function () {
+    if (window.scrollY > 0) {
+      pageTopButton.style.display = "block";
+    } else {
+      pageTopButton.style.display = "none";
+    }
+  });
+
+  pageTopButton.addEventListener("click", function () {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  });
+
+</script>
+
+</body>
+</html>
